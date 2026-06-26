@@ -71,15 +71,15 @@ export default function WallpaperGenerator() {
       await downloadSvgAsPng(svg, w, h, filename);
       toast.success(
         variant === "desktop"
-          ? "Wallpaper desktop baixado"
-          : "Wallpaper iPhone baixado",
+          ? "Desktop wallpaper downloaded"
+          : "iPhone wallpaper downloaded",
         {
           description: `${w}×${h}`,
           icon: <Download className="size-4" />,
         },
       );
     } catch (err) {
-      toast.error("Falha ao gerar imagem", { description: String(err) });
+      toast.error("Failed to generate image", { description: String(err) });
     }
   };
 
@@ -142,13 +142,13 @@ function Header({
           <div className="leading-tight">
             <div className="text-lg font-bold tracking-[0.18em] text-luminous">WLLPR</div>
             <div className="text-[11px] text-muted-foreground/80 hidden sm:block">
-              wallpapers que combinam com você
+              wallpapers that match your vibe
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[11px] uppercase tracking-wider text-muted-foreground/80 hidden md:inline">
-            {isDark ? "Escuro" : "Claro"}
+            {isDark ? "Dark" : "Light"}
           </span>
           <div className="glass-button p-1.5 flex items-center gap-2 rounded-full">
             <Sun
@@ -325,7 +325,7 @@ function Sidebar(props: {
         {/* Designs Section */}
         <Section
           title="Designs"
-          subtitle={`${allPatterns.length} padrões`}
+          subtitle={`${allPatterns.length} patterns`}
           icon={<Monitor className="size-3.5" />}
         >
           <div className="grid grid-cols-2 gap-2.5">
@@ -344,8 +344,8 @@ function Sidebar(props: {
 
         {/* Colors Section */}
         <Section
-          title="Cores"
-          subtitle={`${allPalettes.length} paletas`}
+          title="Colors"
+          subtitle={`${allPalettes.length} palettes`}
           icon={<Sparkles className="size-3.5" />}
         >
           <div className="grid grid-cols-5 gap-2.5">
@@ -367,7 +367,7 @@ function Sidebar(props: {
             className="w-full h-12 glass-button-primary rounded-xl text-sm font-semibold gap-2"
           >
             <Wand2 className="size-4" />
-            Gerar um novo
+            Generate new
           </Button>
           <div className="grid grid-cols-2 gap-2.5">
             <Button
@@ -376,7 +376,7 @@ function Sidebar(props: {
               className="h-12 glass-button rounded-xl gap-2 font-medium hover:bg-transparent hover:!bg-white/15"
             >
               <Download className="size-4" />
-              <span className="text-xs">Baixar Desktop</span>
+              <span className="text-xs">Download Desktop</span>
             </Button>
             <Button
               variant="ghost"
@@ -384,7 +384,7 @@ function Sidebar(props: {
               className="h-12 glass-button rounded-xl gap-2 font-medium hover:bg-transparent hover:!bg-white/15"
             >
               <Smartphone className="size-4" />
-              <span className="text-xs">Baixar iPhone</span>
+              <span className="text-xs">Download iPhone</span>
             </Button>
           </div>
         </div>
