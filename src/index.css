@@ -129,6 +129,13 @@
   }
 }
 
+/* Hide Vly toolbar dev-environment preview overlay that blocks the app on every fresh
+   new-tab load on *.vly.sh. We target only the dialog with the unique aria-labelledby
+   the Vly toolbar assigns, so legitimate dialogs elsewhere are unaffected. */
+div[role="dialog"][aria-labelledby="dev-env-label"] {
+  display: none !important;
+}
+
 /* WLLPR — refined glassmorphism design tokens */
 :root {
   --luminous: #a99cff;
