@@ -484,6 +484,277 @@ const chevron: Pattern = {
   },
 };
 
+const halftone: Pattern = {
+  id: "halftone",
+  name: "Halftone",
+  description: "Print-style dot gradient",
+  renderSvg: (w, h, p) => {
+    const cell = Math.max(8, h * 0.022);
+    const cols = Math.ceil(w / cell) + 1;
+    const rows = Math.ceil(h / cell) + 1;
+    const cx = w / 2;
+    const cy = h / 2;
+    let dots = "";
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = c * cell + cell / 2;
+        const y = r * cell + cell / 2;
+        const dx = (x - cx) / (w / 2);
+        const dy = (y - cy) / (h / 2);
+        const dist = Math.min(1, Math.sqrt(dx * dx + dy * dy));
+        const radius = cell * 0.5 * Math.max(0.05, 1 - dist * 0.85);
+        const fill = dist > 0.55 ? p.primary : p.secondary;
+        dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${radius.toFixed(2)}" fill="${fill}" opacity="0.9" />`;
+      }
+    }
+    return svgWrap("halftone", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${dots}
+`);
+  },
+};
+
+const mosaic: Pattern = {
+  id: "mosaic",
+  name: "Mosaic",
+  description: "Irregular tile fragments",
+  renderSvg: (w, h, p) => {
+    const step = h * 0.085;
+    const cols = Math.ceil(w / step) + 2;
+    const rows = Math.ceil(h / step) + 2;
+    let tiles = "";
+    let seed = 9876543;
+    const rng = () => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
+    };
+    const palette = [p.primary, p.secondary, p.accent];
+    for (let r = -1; r < rows; r++) {
+      for (let c = -1; c < cols; c++) {
+        const x = c * step + (r % 2 === 0 ? 0 : step * 0.32);
+        const y = r * step + rng() * step * 0.15;
+        const variance = rng();
+        const w0 = step * (0.55 + variance * 0.5);
+        const h0 = step * (0.62 + rng() * 0.45);
+        const x0 = x - w0 * 0.05;
+        const y0 = y - h0 * 0.05;
+        const fill = palette[Math.floor(rng() * 3)];
+        const opacity = (0.78 + rng() * 0.18).toFixed(2);
+        tiles += `<rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${w0.toFixed(2)}" height="${h0.toFixed(2)}" fill="${fill}" opacity="${opacity}" />`;
+      }
+    }
+    return svgWrap("mosaic", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${tiles}
+`);
+  },
+};
+
+const plasma: Pattern = {
+  id: "plasma",
+  name: "Plasma",
+  description: "Wave interference",
+  renderSvg: (w, h, p) => {
+    const lines = 28;
+    const segs = 80;
+    let paths = "";
+    const palette = [p.primary, p.secondary, p.accent];
+    for (let i = 0; i < lines; i++) {
+      const yBase = (i / lines) * h;
+      let path = "";
+      for (let s = 0; s <= segs; s++) {
+        const x = (s / segs) * w;
+        const y =
+          yBase +
+          Math.sin((s / segs) * Math.PI * 6 + i * 0.7) * h * 0.035 +
+          Math.cos((s / segs) * Math.PI * 3 + i * 1.2) * h * 0.025;
+        path += `${s === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)} `;
+      }
+      const color = palette[i % 3];
+      const op = (0.55 + (i % 3) * 0.12).toFixed(2);
+      paths += `<path d="${path}" fill="none" stroke="${color}" stroke-width="${(h * 0.008).toFixed(2)}" opacity="${op}" />`;
+    }
+    return svgWrap("plasma", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${paths}
+`);
+  },
+};
+
+const ribbons: Pattern = {
+  id: "ribbons",
+  name: "Ribbons",
+  description: "Flowing Bezier bands",
+  renderSvg: (w, h, p) => {
+    const count = 7;
+    const palette = [p.primary, p.secondary, p.accent];
+    let bands = "";
+    for (let i = 0; i < count; i++) {
+      const base = h * (0.13 + i * 0.115);
+      const amp = h * 0.055;
+      const segs = 14;
+      const points: { x: number; y: number }[] = [];
+      for (let s = 0; s <= segs; s++) {
+        const x = (s / segs) * w;
+        const offset = Math.sin((s / segs) * Math.PI * 2 + i * 0.5) * amp;
+        points.push({ x, y: base + offset });
+      }
+      const d =
+        "M " +
+        points.map((pt) => `${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`).join(" L ") +
+        ` L ${w} ${h} L 0 ${h} Z`;
+      const color = palette[i % 3];
+      const op = (0.62 + (i % 3) * 0.1).toFixed(2);
+      bands += `<path d="${d}" fill="${color}" opacity="${op}" />`;
+    }
+    return svgWrap("ribbons", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${bands}
+`);
+  },
+};
+
+const trellis: Pattern = {
+  id: "trellis",
+  name: "Trellis",
+  description: "Diamond lattice",
+  renderSvg: (w, h, p) => {
+    const step = h * 0.1;
+    const strokeW = step * 0.18;
+    const cols = Math.ceil(w / step) + 2;
+    const rows = Math.ceil(h / step) + 2;
+    const palette = [p.primary, p.secondary, p.accent];
+    let lines = "";
+    for (let r = -1; r < rows; r++) {
+      for (let c = -1; c < cols; c++) {
+        const x = c * step;
+        const y = r * step;
+        const color = palette[(r + c) % 3];
+        lines += `<line x1="${x}" y1="${y + step}" x2="${x + step}" y2="${y}" stroke="${color}" stroke-width="${strokeW}" opacity="0.85" />`;
+        lines += `<line x1="${x + step}" y1="${y}" x2="${x + step * 2}" y2="${y + step}" stroke="${color}" stroke-width="${strokeW}" opacity="0.85" />`;
+      }
+    }
+    return svgWrap("trellis", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${lines}
+`);
+  },
+};
+
+const stipple: Pattern = {
+  id: "stipple",
+  name: "Stipple",
+  description: "Radial dot scatter",
+  renderSvg: (w, h, p) => {
+    const count = 700;
+    const cx = w * 0.5;
+    const cy = h * 0.55;
+    let seed = 5432109;
+    const rng = () => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
+    };
+    let pts = "";
+    const palette = [p.primary, p.secondary, p.accent];
+    for (let i = 0; i < count; i++) {
+      const angle = rng() * Math.PI * 2;
+      const t = Math.pow(rng(), 0.6); // bias outward
+      const radius = Math.min(w, h) * 0.55 * t;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      const dotR = 1 + (1 - t) * (h * 0.013);
+      const colorRng = Math.floor(rng() * 4);
+      const color =
+        colorRng === 0
+          ? p.primary
+          : colorRng === 2
+            ? p.secondary
+            : p.accent;
+      const opacity = (0.45 + rng() * 0.5).toFixed(2);
+      pts += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotR.toFixed(2)}" fill="${color}" opacity="${opacity}" />`;
+    }
+    return svgWrap("stipple", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${pts}
+`);
+  },
+};
+
+const topographic: Pattern = {
+  id: "topographic",
+  name: "Topographic",
+  description: "Wavy contour rings",
+  renderSvg: (w, h, p) => {
+    const cx = w * 0.5;
+    const cy = h * 0.6;
+    const maxR = Math.min(w, h) * 0.7;
+    const rings = 20;
+    let lines = "";
+    for (let i = 0; i < rings; i++) {
+      const baseR = maxR * (i / rings) + 6;
+      let path = "";
+      const points = 90;
+      for (let k = 0; k <= points; k++) {
+        const t = (k / points) * Math.PI * 2;
+        const wave =
+          Math.sin(t * 8 + i * 0.5) * baseR * 0.05 +
+          Math.cos(t * 5 - i * 0.3) * baseR * 0.035;
+        const r = baseR + wave;
+        const x = cx + Math.cos(t) * r;
+        const y = cy + Math.sin(t) * r;
+        path += `${k === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)} `;
+      }
+      const color = [p.primary, p.secondary, p.accent][i % 3];
+      const op = (0.5 + (i % 3) * 0.18).toFixed(2);
+      lines += `<path d="${path}" fill="none" stroke="${color}" stroke-width="${Math.max(2, h * 0.006).toFixed(2)}" opacity="${op}" />`;
+    }
+    return svgWrap("topographic", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${lines}
+`);
+  },
+};
+
+const pixel: Pattern = {
+  id: "pixel",
+  name: "Pixel",
+  description: "Chunky pixel blocks",
+  renderSvg: (w, h, p) => {
+    const step = h * 0.075;
+    const cols = Math.ceil(w / step);
+    const rows = Math.ceil(h / step);
+    let seed = 1928374;
+    const rng = () => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
+    };
+    let blocks = "";
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = c * step;
+        const y = r * step;
+        const roll = rng();
+        let fill: string | null = null;
+        if (roll < 0.18) fill = p.primary;
+        else if (roll < 0.36) fill = p.secondary;
+        else if (roll < 0.5) fill = p.accent;
+        if (fill) {
+          const w0 = step * (0.7 + rng() * 0.4);
+          const h0 = step * (0.7 + rng() * 0.4);
+          const x0 = x + (step - w0) / 2;
+          const y0 = y + (step - h0) / 2;
+          const opacity = (0.82 + rng() * 0.15).toFixed(2);
+          blocks += `<rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${w0.toFixed(2)}" height="${h0.toFixed(2)}" fill="${fill}" opacity="${opacity}" />`;
+        }
+      }
+    }
+    return svgWrap("pixel", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${blocks}
+`);
+  },
+};
+
 export const patterns: Pattern[] = [
   aurora,
   bauhaus,
@@ -501,6 +772,14 @@ export const patterns: Pattern[] = [
   blob,
   triangles,
   chevron,
+  halftone,
+  mosaic,
+  plasma,
+  ribbons,
+  trellis,
+  stipple,
+  topographic,
+  pixel,
 ];
 
 export const patternById = (id: string) =>
