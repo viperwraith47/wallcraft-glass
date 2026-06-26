@@ -1,32 +1,24 @@
-import '@vly-ai/integrations';
 import { Toaster } from "@/components/ui/sonner";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { InstrumentationProvider } from "@/instrumentation.tsx";
-import { ConvexAuthProvider } from "@convex-dev/auth/react";
-import { ConvexReactClient } from "convex/react";
 import { StrictMode, useEffect, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
 import "./types/global.d.ts";
 
-// Lazy load route components for better code splitting
+// Lazy load route components for better code splitting.
+// WLLPR is a fully client-side wallpaper generator — no backend needed.
 const Landing = lazy(() => import("./pages/Landing.tsx"));
-const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
-// Simple loading fallback for route transitions
 function RouteLoading() {
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="animate-pulse text-muted-foreground">Loading…</div>
     </div>
   );
 }
-
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-
-
 
 function RouteSyncer() {
   const location = useLocation();
@@ -51,24 +43,20 @@ function RouteSyncer() {
   return null;
 }
 
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <VlyToolbar />
     <InstrumentationProvider>
-      <ConvexAuthProvider client={convex}>
-        <BrowserRouter>
-          <RouteSyncer />
-          <Suspense fallback={<RouteLoading />}>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/auth" element={<AuthPage redirectAfterAuth="/" />} /> {/* TODO: change redirect after auth to correct page */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-        <Toaster />
-      </ConvexAuthProvider>
+      <BrowserRouter>
+        <RouteSyncer />
+        <Suspense fallback={<RouteLoading />}>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+      <Toaster />
     </InstrumentationProvider>
   </StrictMode>,
 );
