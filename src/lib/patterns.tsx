@@ -261,7 +261,6 @@ const particles: Pattern = {
       seed = (seed * 1103515245 + 12345) % 2147483648;
       return seed / 2147483648;
     };
-    const palette = [p.primary, p.secondary, p.accent];
     for (let i = 0; i < count; i++) {
       const x = rng() * w;
       const y = rng() * h;
@@ -655,7 +654,6 @@ const stipple: Pattern = {
       return seed / 2147483648;
     };
     let pts = "";
-    const palette = [p.primary, p.secondary, p.accent];
     for (let i = 0; i < count; i++) {
       const angle = rng() * Math.PI * 2;
       const t = Math.pow(rng(), 0.6); // bias outward
@@ -755,6 +753,251 @@ const pixel: Pattern = {
   },
 };
 
+const diamond: Pattern = {
+  id: "diamond",
+  name: "Diamond",
+  description: "Rotated square grid",
+  renderSvg: (w, h, p) => {
+    const step = h * 0.12;
+    const cols = Math.ceil(w / step) + 3;
+    const rows = Math.ceil(h / step) + 3;
+    let tiles = "";
+    const palette = [p.primary, p.secondary, p.accent];
+    for (let r = -1; r < rows; r++) {
+      for (let c = -1; c < cols; c++) {
+        const x = c * step + (r % 2 === 0 ? 0 : step / 2);
+        const y = r * step;
+        const idx = (r * 3 + c * 5 + 7) % 3;
+        const fill = palette[idx];
+        const opacity = (0.55 + ((r + c) % 3) * 0.15).toFixed(2);
+        tiles += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${step.toFixed(2)}" height="${step.toFixed(2)}" fill="${fill}" opacity="${opacity}" transform="rotate(45 ${(x + step / 2).toFixed(1)} ${(y + step / 2).toFixed(1)})" />`;
+      }
+    }
+    return svgWrap("diamond", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${tiles}
+`);
+  },
+};
+
+const hexagon: Pattern = {
+  id: "hexagon",
+  name: "Hexagon",
+  description: "Honeycomb grid",
+  renderSvg: (w, h, p) => {
+    const size = h * 0.09;
+    const hexH = size * Math.sqrt(3);
+    const cols = Math.ceil(w / (size * 3)) + 2;
+    const rows = Math.ceil(h / hexH) + 2;
+    const palette = [p.primary, p.secondary, p.accent];
+    let hexes = "";
+    for (let r = -1; r < rows; r++) {
+      for (let c = -1; c < cols; c++) {
+        const xOff = c * size * 3 + (r % 2 === 0 ? 0 : size * 1.5);
+        const yOff = r * hexH;
+        const pts: string[] = [];
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i - Math.PI / 6;
+          pts.push(`${(xOff + size * Math.cos(angle)).toFixed(1)},${(yOff + size * Math.sin(angle)).toFixed(1)}`);
+        }
+        const idx = (r * 2 + c * 3 + 5) % 3;
+        const fill = palette[idx];
+        const opacity = (0.5 + ((r * 7 + c) % 3) * 0.2).toFixed(2);
+        hexes += `<polygon points="${pts.join(" ")}" fill="${fill}" opacity="${opacity}" />`;
+      }
+    }
+    return svgWrap("hexagon", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${hexes}
+`);
+  },
+};
+
+const zigzag: Pattern = {
+  id: "zigzag",
+  name: "Zigzag",
+  description: "Sharp zigzag lines",
+  renderSvg: (w, h, p) => {
+    const rows = 18;
+    const amp = h * 0.04;
+    let lines = "";
+    const palette = [p.primary, p.secondary, p.accent];
+    for (let r = 0; r < rows; r++) {
+      const y = (r / rows) * h + h * 0.025;
+      const segs = 24;
+      let path = "";
+      for (let s = 0; s <= segs; s++) {
+        const x = (s / segs) * w;
+        const offset = s % 2 === 0 ? -amp : amp;
+        path += `${s === 0 ? "M" : "L"} ${x.toFixed(1)} ${(y + offset).toFixed(1)} `;
+      }
+      const color = palette[r % 3];
+      const op = (0.55 + (r % 3) * 0.15).toFixed(2);
+      lines += `<path d="${path}" fill="none" stroke="${color}" stroke-width="${(h * 0.01).toFixed(2)}" opacity="${op}" stroke-linecap="round" stroke-linejoin="round" />`;
+    }
+    return svgWrap("zigzag", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${lines}
+`);
+  },
+};
+
+const crystals: Pattern = {
+  id: "crystals",
+  name: "Crystals",
+  description: "Angular gem shards",
+  renderSvg: (w, h, p) => {
+    const count = 18;
+    let seed = 7654321;
+    const rng = () => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
+    };
+    const palette = [p.primary, p.secondary, p.accent];
+    let shapes = "";
+    for (let i = 0; i < count; i++) {
+      const cx = rng() * w;
+      const cy = rng() * h;
+      const size = h * (0.04 + rng() * 0.08);
+      const sides = 4 + Math.floor(rng() * 3);
+      const angle = rng() * Math.PI * 2;
+      const pts: string[] = [];
+      for (let s = 0; s < sides; s++) {
+        const a = angle + (s / sides) * Math.PI * 2;
+        const r = size * (0.6 + rng() * 0.5);
+        pts.push(`${(cx + Math.cos(a) * r).toFixed(1)},${(cy + Math.sin(a) * r).toFixed(1)}`);
+      }
+      const fill = palette[i % 3];
+      const opacity = (0.35 + rng() * 0.55).toFixed(2);
+      shapes += `<polygon points="${pts.join(" ")}" fill="${fill}" opacity="${opacity}" />`;
+    }
+    return svgWrap("crystals", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${shapes}
+`);
+  },
+};
+
+const burst: Pattern = {
+  id: "burst",
+  name: "Burst",
+  description: "Radial ray burst",
+  renderSvg: (w, h, p) => {
+    const cx = w * 0.5;
+    const cy = h * 0.5;
+    const rays = 36;
+    const maxR = Math.max(w, h) * 0.8;
+    let shapes = "";
+    const palette = [p.primary, p.secondary, p.accent];
+    for (let i = 0; i < rays; i++) {
+      const a1 = (i / rays) * Math.PI * 2;
+      const a2 = ((i + 0.5) / rays) * Math.PI * 2;
+      const x1 = cx + Math.cos(a1) * maxR;
+      const y1 = cy + Math.sin(a1) * maxR;
+      const x2 = cx + Math.cos(a2) * maxR;
+      const y2 = cy + Math.sin(a2) * maxR;
+      const fill = palette[i % 3];
+      const opacity = (0.35 + (i % 3) * 0.15).toFixed(2);
+      shapes += `<polygon points="${cx},${cy} ${x1.toFixed(1)},${y1.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}" fill="${fill}" opacity="${opacity}" />`;
+    }
+    return svgWrap("burst", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${shapes}
+  <circle cx="${cx}" cy="${cy}" r="${(h * 0.06).toFixed(1)}" fill="${p.accent}" opacity="0.9" />
+`);
+  },
+};
+
+const crosshatch: Pattern = {
+  id: "crosshatch",
+  name: "Crosshatch",
+  description: "Diagonal line weave",
+  renderSvg: (w, h, p) => {
+    const step = h * 0.06;
+    const count = Math.ceil((w + h) / step);
+    let lines = "";
+    const palette = [p.primary, p.secondary, p.accent];
+    for (let i = 0; i < count; i++) {
+      const offset = i * step;
+      const color = palette[i % 3];
+      const op = (0.3 + (i % 3) * 0.15).toFixed(2);
+      // Diagonal down-right
+      lines += `<line x1="${offset}" y1="0" x2="${offset - h}" y2="${h}" stroke="${color}" stroke-width="${(step * 0.12).toFixed(2)}" opacity="${op}" />`;
+      // Diagonal down-left
+      lines += `<line x1="${offset}" y1="0" x2="${offset + h}" y2="${h}" stroke="${palette[(i + 1) % 3]}" stroke-width="${(step * 0.12).toFixed(2)}" opacity="${op}" />`;
+    }
+    return svgWrap("crosshatch", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${lines}
+`);
+  },
+};
+
+const cascade: Pattern = {
+  id: "cascade",
+  name: "Cascade",
+  description: "Waterfall drops",
+  renderSvg: (w, h, p) => {
+    let seed = 3210987;
+    const rng = () => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
+    };
+    const drops = 45;
+    const palette = [p.primary, p.secondary, p.accent];
+    let shapes = "";
+    for (let i = 0; i < drops; i++) {
+      const x = rng() * w;
+      const y = rng() * h;
+      const dropH = h * (0.05 + rng() * 0.12);
+      const dropW = dropH * (0.15 + rng() * 0.12);
+      const fill = palette[i % 3];
+      const opacity = (0.4 + rng() * 0.5).toFixed(2);
+      shapes += `<path d="M ${x} ${y} Q ${x + dropW / 2} ${y + dropH * 0.7} ${x} ${y + dropH} Q ${x - dropW / 2} ${y + dropH * 0.7} ${x} ${y} Z" fill="${fill}" opacity="${opacity}" />`;
+    }
+    return svgWrap("cascade", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${shapes}
+`);
+  },
+};
+
+const topaz: Pattern = {
+  id: "topaz",
+  name: "Topaz",
+  description: "Faceted gem cuts",
+  renderSvg: (w, h, p) => {
+    const cx = w * 0.5;
+    const cy = h * 0.5;
+    const layers = 5;
+    let shapes = "";
+    const palette = [p.primary, p.secondary, p.accent];
+    for (let l = layers; l >= 1; l--) {
+      const r = Math.min(w, h) * 0.08 * l * 2.5;
+      const pts = 6;
+      const points: string[] = [];
+      for (let i = 0; i < pts; i++) {
+        const a = (i / pts) * Math.PI * 2 - Math.PI / 6;
+        points.push(`${(cx + Math.cos(a) * r).toFixed(1)},${(cy + Math.sin(a) * r).toFixed(1)}`);
+      }
+      const fill = palette[l % 3];
+      const opacity = (0.25 + l * 0.1).toFixed(2);
+      shapes += `<polygon points="${points.join(" ")}" fill="${fill}" opacity="${opacity}" />`;
+      // Inner facet lines
+      for (let i = 0; i < pts; i++) {
+        const a = (i / pts) * Math.PI * 2 - Math.PI / 6;
+        const innerR = r * 0.5;
+        shapes += `<line x1="${cx}" y1="${cy}" x2="${(cx + Math.cos(a) * innerR).toFixed(1)}" y2="${(cy + Math.sin(a) * innerR).toFixed(1)}" stroke="${p.background}" stroke-width="1" opacity="0.3" />`;
+      }
+    }
+    return svgWrap("topaz", w, h, `
+  <rect width="${w}" height="${h}" fill="${p.background}" />
+  ${shapes}
+  <circle cx="${cx}" cy="${cy}" r="${(h * 0.02).toFixed(1)}" fill="${p.accent}" opacity="0.9" />
+`);
+  },
+};
+
 export const patterns: Pattern[] = [
   aurora,
   bauhaus,
@@ -780,6 +1023,14 @@ export const patterns: Pattern[] = [
   stipple,
   topographic,
   pixel,
+  diamond,
+  hexagon,
+  zigzag,
+  crystals,
+  burst,
+  crosshatch,
+  cascade,
+  topaz,
 ];
 
 export const patternById = (id: string) =>

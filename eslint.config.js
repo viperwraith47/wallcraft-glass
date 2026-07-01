@@ -30,4 +30,16 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Disable strict React Compiler rules for auto-generated shadcn/ui components.
+    // These use standard patterns (setState-in-effect, Math.random in useMemo, ref writes
+    // during render) that are intentional and correct in this context.
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/purity": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/set-state-in-render": "off",
+    },
+  },
 );

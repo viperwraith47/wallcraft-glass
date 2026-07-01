@@ -79,6 +79,7 @@ export default defineConfig({
   },
   // Performance hints
   server: {
+    port: 3000,
     // Keep HMR on, but disable full-screen error overlay
     hmr: {
       overlay: false,

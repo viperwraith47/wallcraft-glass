@@ -8,7 +8,13 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "./start.command",
+    "start:dev": "./start.command dev",
+    "start:prod": "./start.command prod",
+    "stop": "./stop.command",
+    "stop:dev": "./stop.command dev",
+    "stop:prod": "./stop.command prod"
   },
   "dependencies": {
     "@convex-dev/auth": "^0.0.90",
