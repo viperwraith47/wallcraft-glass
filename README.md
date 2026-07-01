@@ -1,259 +1,247 @@
-##Demo
-This app is active on: https://wallcraft.freebuff.app/
-## Overview
+# WLLPR — Glass Wallpaper Generator
 
-This project uses the following tech stack:
-- Vite
-- Typescript
-- React Router v7 (all imports from `react-router` instead of `react-router-dom`)
-- React 19 (for frontend components)
-- Tailwind v4 (for styling)
-- Shadcn UI (for UI components library)
-- Lucide Icons (for icons)
-- Convex (for backend & database)
-- Convex Auth (for authentication)
-- Framer Motion (for animations)
-- Three js (for 3d models)
-
-All relevant files live in the 'src' directory.
-
-Use bun for the package manager.
-
-## Setup
-
-This project is set up already and running on a cloud environment, as well as a convex development in the sandbox.
-
-## Environment Variables
-
-The project is set up with project specific CONVEX_DEPLOYMENT and VITE_CONVEX_URL environment variables on the client side.
-
-The convex server has a separate set of environment variables that are accessible by the convex backend.
-
-Currently, these variables include auth-specific keys: JWKS, JWT_PRIVATE_KEY, and SITE_URL.
+A fully client-side wallpaper generator that runs entirely in the browser — no backend round-trips required for the core experience. Choose from **29 palettes** and **32 patterns** to create beautiful desktop and mobile wallpapers, then export them as high-resolution PNGs.
 
 
-# Using Authentication (Important!)
+## Features
 
-You must follow these conventions when using authentication.
+- **29 curated color palettes** — from Aurora and Cyberpunk to Pastel Dream and Volcanic
+- **32 unique patterns** — aurora fields, Bauhaus geometry, concentric rings, waves, hexagons, crystals, crosshatch, and more
+- **Dual preview** — see your wallpaper on a desktop monitor and phone mockup side by side
+- **Export as PNG** — download at 1920×1080 (desktop) or 1170×2532 (iPhone 14 Pro Max)
+- **Randomize** — one-click random palette + pattern combination
+- **Glassmorphism UI** — frosted glass panels, bezels, and interactive hover effects
+- **Fully responsive** — works on mobile and desktop
+- **Dark mode** — native dark/light theme support
 
-## Auth is already set up.
+---
 
-All convex authentication functions are already set up. The auth currently uses email OTP and anonymous users, but can support more.
+## Tech Stack
 
-The email OTP configuration is defined in `src/convex/auth/emailOtp.ts`. DO NOT MODIFY THIS FILE.
+| Layer | Technology |
+|-------|-----------|
+| Build & Dev | Vite 7, Bun, TypeScript 5.9 |
+| UI | React 19, React Router v7, Tailwind v4, Shadcn UI (new-york) |
+| Animations | Framer Motion |
+| Icons | Lucide React |
+| 3D (optional) | Three.js |
+| Backend (optional) | Convex + Convex Auth (email OTP, anonymous) |
+| Lint & Format | ESLint 9, Prettier 3 |
+| Self-Hosting | Deno + Hono (`main.ts`) |
 
-Also, DO NOT MODIFY THESE AUTH FILES: `src/convex/auth.config.ts` and `src/convex/auth.ts`.
+---
 
-## Using Convex Auth on the backend
+## Quick Start
 
-On the `src/convex/users.ts` file, you can use the `getCurrentUser` function to get the current user's data.
+### Prerequisites
 
-## Using Convex Auth on the frontend
+- [Bun](https://bun.sh/) (package manager)
+- [Deno](https://deno.land/) (for production server, optional)
+- [Node.js](https://nodejs.org/) ≥ 18
 
-The `/auth` page is already set up to use auth. Navigate to `/auth` for all log in / sign up sequences.
+### Install & Run
 
-You MUST use this hook to get user data. Never do this yourself without the hook:
-```typescript
-import { useAuth } from "@/hooks/use-auth";
+```bash
+# Install dependencies
+bun install
 
-const { isLoading, isAuthenticated, user, signIn, signOut } = useAuth();
+# Start dev server (Vite on port 3000 + Deno prod server on port 8000)
+bun start
+
+# Stop all servers
+bun stop
 ```
 
-## Protected Routes
+Or use the macOS double-clickable scripts:
 
-When protecting a page, use the auth hooks to check for authentication and redirect to /auth.
+```bash
+./start.command    # Start dev + prod servers
+./stop.command     # Stop all servers
+```
 
-## Auth Page
+### Other Commands
 
-The auth page is defined in `src/pages/Auth.tsx`. Redirect authenticated pages and sign in / sign up to /auth.
+```bash
+bun run dev        # Vite dev server only (port 3000)
+bun run build      # Type-check + production build → dist/
+bun run preview    # Serve built dist/ locally
+bun run lint       # ESLint
+bun run format     # Prettier --write
+```
 
-## Authorization
+### Production Server
 
-You can perform authorization checks on the frontend and backend.
+The built output can be served with Deno + Hono:
 
-On the frontend, you can use the `useAuth` hook to get the current user's data and authentication state.
+```bash
+bun run build
+deno run -A main.ts
+```
 
-You should also be protecting queries, mutations, and actions at the base level, checking for authorization securely.
+This serves the `dist/` directory as a static SPA on **http://localhost:8000**.
 
-## Adding a redirect after auth
+---
 
-In `src/main.tsx`, you must add a redirect after auth URL to redirect to the correct dashboard/profile/page that should be created after authentication.
-
-# Frontend Conventions
-
-You will be using the Vite frontend with React 19, Tailwind v4, and Shadcn UI.
-
-Generally, pages should be in the `src/pages` folder, and components should be in the `src/components` folder.
-
-Shadcn primitives are located in the `src/components/ui` folder and should be used by default.
-
-## Page routing
-
-Your page component should go under the `src/pages` folder.
-
-When adding a page, update the react router configuration in `src/main.tsx` to include the new route you just added.
-
-## Shad CN conventions
-
-Follow these conventions when using Shad CN components, which you should use by default.
-- Remember to use "cursor-pointer" to make the element clickable
-- For title text, use the "tracking-tight font-bold" class to make the text more readable
-- Always make apps MOBILE RESPONSIVE. This is important
-- AVOID NESTED CARDS. Try and not to nest cards, borders, components, etc. Nested cards add clutter and make the app look messy.
-- AVOID SHADOWS. Avoid adding any shadows to components. stick with a thin border without the shadow.
-- Avoid skeletons; instead, use the loader2 component to show a spinning loading state when loading data.
-
-
-## Landing Pages
-
-You must always create good-looking designer-level styles to your application. 
-- Make it well animated and fit a certain "theme", ie neo brutalist, retro, neumorphism, glass morphism, etc
-
-Use known images and emojis from online.
-
-If the user is logged in already, show the get started button to say "Dashboard" or "Profile" instead to take them there.
-
-## Responsiveness and formatting
-
-Make sure pages are wrapped in a container to prevent the width stretching out on wide screens. Always make sure they are centered aligned and not off-center.
-
-Always make sure that your designs are mobile responsive. Verify the formatting to ensure it has correct max and min widths as well as mobile responsiveness.
-
-- Always create sidebars for protected dashboard pages and navigate between pages
-- Always create navbars for landing pages
-- On these bars, the created logo should be clickable and redirect to the index page
-
-## Animating with Framer Motion
-
-You must add animations to components using Framer Motion. It is already installed and configured in the project.
-
-To use it, import the `motion` component from `framer-motion` and use it to wrap the component you want to animate.
-
-
-### Other Items to animate
-- Fade in and Fade Out
-- Slide in and Slide Out animations
-- Rendering animations
-- Button clicks and UI elements
-
-Animate for all components, including on landing page and app pages.
-
-## Three JS Graphics
-
-Your app comes with three js by default. You can use it to create 3D graphics for landing pages, games, etc.
-
-
-## Colors
-
-You can override colors in: `src/index.css`
-
-This uses the oklch color format for tailwind v4.
-
-Always use these color variable names.
-
-Make sure all ui components are set up to be mobile responsive and compatible with both light and dark mode.
-
-Set theme using `dark` or `light` variables at the parent className.
-
-## Styling and Theming
-
-When changing the theme, always change the underlying theme of the shad cn components app-wide under `src/components/ui` and the colors in the index.css file.
-
-Avoid hardcoding in colors unless necessary for a use case, and properly implement themes through the underlying shad cn ui components.
-
-When styling, ensure buttons and clickable items have pointer-click on them (don't by default).
-
-Always follow a set theme style and ensure it is tuned to the user's liking.
-
-## Toasts
-
-You should always use toasts to display results to the user, such as confirmations, results, errors, etc.
-
-Use the shad cn Sonner component as the toaster. For example:
+## Project Structure
 
 ```
-import { toast } from "sonner"
+.
+├── main.ts                    # Deno + Hono static server
+├── index.html                 # Vite HTML entry
+├── src/
+│   ├── main.tsx               # React root, router setup
+│   ├── index.css              # Tailwind v4 theme (oklch color tokens)
+│   ├── pages/
+│   │   ├── WallpaperGenerator.tsx   # Main wallpaper generator page
+│   │   ├── Landing.tsx             # Landing page
+│   │   ├── Auth.tsx                # Authentication page
+│   │   └── NotFound.tsx            # 404 page
+│   ├── components/
+│   │   └── ui/                # Shadcn UI primitives
+│   ├── hooks/
+│   │   ├── use-auth.ts        # Convex auth hook
+│   │   └── use-mobile.ts      # Mobile detection hook
+│   ├── lib/
+│   │   ├── palettes.ts        # 30 curated color palettes
+│   │   ├── patterns.tsx        # 32 SVG pattern renderers
+│   │   ├── export.ts           # PNG export via @zumer/snapdom
+│   │   ├── utils.ts            # Utility functions
+│   │   └── vly-integrations.ts # VLY integration layer
+│   └── convex/                 # Convex backend (auth, users, schema)
+├── isolate/                    # Standalone PWA bundle
+├── start.command               # macOS start script
+└── stop.command                # macOS stop script
+```
 
-import { Button } from "@/components/ui/button"
-export function SonnerDemo() {
-  return (
-    <Button
-      variant="outline"
-      onClick={() =>
-        toast("Event has been created", {
-          description: "Sunday, December 03, 2023 at 9:00 AM",
-          action: {
-            label: "Undo",
-            onClick: () => console.log("Undo"),
-          },
-        })
-      }
-    >
-      Show Toast
-    </Button>
-  )
+---
+
+## Palettes (29)
+
+| Palette | Primary | Secondary | Accent | Background |
+|---------|---------|-----------|--------|------------|
+| Aurora | `#FF6BA8` | `#7B5FFF` | `#3FE0E0` | `#0A0A1F` |
+| Ocean | `#1E7AFF` | `#00C9C9` | `#A8F0FF` | `#04111F` |
+| Sunset | `#FF6A3D` | `#FFB347` | `#FFE8B0` | `#1A0930` |
+| Forest | `#2BB96E` | `#7CE0A0` | `#E8FFCE` | `#08241B` |
+| Sakura | `#FF92C2` | `#FFC4D8` | `#5A1F45` | `#1B0518` |
+| Cosmic | `#5B4FFF` | `#9D4FFF` | `#E0BFFF` | `#08051A` |
+| Mono Light | `#1A1A1A` | `#3A3A3A` | `#8A8A8A` | `#F2EFE6` |
+| Mono Dark | `#F2F2F2` | `#BFBFBF` | `#666666` | `#0A0A0A` |
+| Earth | `#C97B4A` | `#E8C18A` | `#3A4A2E` | `#1B130A` |
+| Citrus | `#FFD23F` | `#9FE870` | `#FF7A59` | `#0F1A04` |
+| Lavender Mist | `#A48BE3` | `#DCC8F7` | `#F7E8A0` | `#F9F6F2` |
+| Midnight | `#3B82F6` | `#1E40AF` | `#93C5FD` | `#050816` |
+| Coral Reef | `#FF7E5F` | `#FEB47B` | `#FFD56F` | `#1A0E2E` |
+| Mint | `#4ADE80` | `#A7F3D0` | `#FBCFE8` | `#042F1A` |
+| Ember | `#EF4444` | `#F97316` | `#FCD34D` | `#1A0808` |
+| Electric | `#D946EF` | `#06B6D4` | `#FDF4FF` | `#08001A` |
+| Olive Grove | `#84CC16` | `#A16207` | `#D4D4A8` | `#1A1F08` |
+| Storm | `#64748B` | `#94A3B8` | `#CBD5E1` | `#0F172A` |
+| Rose Gold | `#F472B6` | `#FCD34D` | `#FBCFE8` | `#1B0F1A` |
+| Ice | `#7DD3FC` | `#E0F2FE` | `#FFFFFF` | `#0F172A` |
+| Cyberpunk | `#FF2D7B` | `#00F0FF` | `#FACC15` | `#0A0014` |
+| Tropical | `#FF6B35` | `#00C49A` | `#FFD166` | `#0B1A12` |
+| Rose Quartz | `#D4618C` | `#C9B1D0` | `#F5E6F0` | `#1A0F15` |
+| Nebula | `#8B5CF6` | `#3B82F6` | `#F472B6` | `#0C0520` |
+| Desert | `#D4A574` | `#E8C9A0` | `#C2724D` | `#1A120A` |
+| Frost | `#A5B4FC` | `#C7D2FE` | `#E0E7FF` | `#0F172A` |
+| Volcanic | `#DC2626` | `#F97316` | `#FBBF24` | `#1C0800` |
+| Pastel Dream | `#F9A8D4` | `#A5F3FC` | `#FDE68A` | `#1E1B2E` |
+| Slate | `#64748B` | `#94A3B8` | `#E2E8F0` | `#0F172A` |
+
+---
+
+## Patterns (32)
+
+| Pattern | Description |
+|---------|-------------|
+| Aurora | Soft color fields |
+| Bauhaus | Geometric primitives |
+| Concentric | Layered rings |
+| Waves | Layered sine curves |
+| Bricks | Offset rectangle mosaic |
+| Dots | Focal dot grid |
+| Stripes | Wide diagonal stripes |
+| Orbs | Floating spheres |
+| Particles | Deterministic dots |
+| Mesh | Blurred color mesh |
+| Lattice | Crosshatched lines |
+| Horizon | Sun arc |
+| Spiral | Logarithmic spiral |
+| Blob | Macro organic form |
+| Triangles | Tessellated triangles |
+| Chevron | Repeating V |
+| Halftone | Print-style dot gradient |
+| Mosaic | Irregular tile fragments |
+| Plasma | Wave interference |
+| Ribbons | Flowing Bezier bands |
+| Trellis | Diamond lattice |
+| Stipple | Radial dot scatter |
+| Topographic | Wavy contour rings |
+| Pixel | Chunky pixel blocks |
+| Diamond | Rotated square grid |
+| Hexagon | Honeycomb grid |
+| Zigzag | Sharp zigzag lines |
+| Crystals | Angular gem shards |
+| Burst | Radial ray burst |
+| Crosshatch | Diagonal line weave |
+| Cascade | Waterfall drops |
+| Topaz | Faceted gem cuts |
+
+---
+
+## Architecture
+
+The wallpaper generator is **entirely client-side** — patterns are rendered as SVG strings in the browser, and PNG export uses `@zumer/snapdom` to capture the DOM. No API calls are needed for the core experience.
+
+### Adding a Palette
+
+Palettes are defined in `src/lib/palettes.ts`. Each palette has `primary`, `secondary`, `accent`, and `background` colors:
+
+```ts
+{
+  id: "my-palette",
+  name: "My Palette",
+  primary: "#FF0000",
+  secondary: "#00FF00",
+  accent: "#0000FF",
+  background: "#000000",
 }
 ```
 
-Remember to import { toast } from "sonner". Usage: `toast("Event has been created.")`
+### Adding a Pattern
 
-## Dialogs
-
-Always ensure your larger dialogs have a scroll in its content to ensure that its content fits the screen size. Make sure that the content is not cut off from the screen.
-
-Ideally, instead of using a new page, use a Dialog instead. 
-
-# Using the Convex backend
-
-You will be implementing the convex backend. Follow your knowledge of convex and the documentation to implement the backend.
-
-## The Convex Schema
-
-You must correctly follow the convex schema implementation.
-
-The schema is defined in `src/convex/schema.ts`.
-
-Do not include the `_id` and `_creationTime` fields in your queries (it is included by default for each table).
-Do not index `_creationTime` as it is indexed for you. Never have duplicate indexes.
-
-
-## Convex Actions: Using CRUD operations
-
-When running anything that involves external connections, you must use a convex action with "use node" at the top of the file.
-
-You cannot have queries or mutations in the same file as a "use node" action file. Thus, you must use pre-built queries and mutations in other files.
-
-You can also use the pre-installed internal crud functions for the database:
+Patterns are defined in `src/lib/patterns.tsx`. Each pattern has a `renderSvg(w, h, palette)` function that returns SVG markup:
 
 ```ts
-// in convex/users.ts
-import { crud } from "convex-helpers/server/crud";
-import schema from "./schema.ts";
-
-export const { create, read, update, destroy } = crud(schema, "users");
-
-// in some file, in an action:
-const user = await ctx.runQuery(internal.users.read, { id: userId });
-
-await ctx.runMutation(internal.users.update, {
-  id: userId,
-  patch: {
-    status: "inactive",
+{
+  id: "my-pattern",
+  name: "My Pattern",
+  description: "Description text",
+  renderSvg: (w, h, p) => {
+    return `<svg>...</svg>`;
   },
-});
+}
 ```
 
+---
 
-## Common Convex Mistakes To Avoid
+## Convex Setup (Optional)
 
-When using convex, make sure:
-- Document IDs are referenced as `_id` field, not `id`.
-- Document ID types are referenced as `Id<"TableName">`, not `string`.
-- Document object types are referenced as `Doc<"TableName">`.
-- Keep schemaValidation to false in the schema file.
-- You must correctly type your code so that it passes the type checker.
-- You must handle null / undefined cases of your convex queries for both frontend and backend, or else it will throw an error that your data could be null or undefined.
-- Always use the `@/folder` path, with `@/convex/folder/file.ts` syntax for importing convex files.
-- This includes importing generated files like `@/convex/_generated/server`, `@/convex/_generated/api`
-- Remember to import functions like useQuery, useMutation, useAction, etc. from `convex/react`
-- NEVER have return type validators.
+The auth scaffolding uses Convex with email OTP and anonymous users. Environment variables:
+
+| Variable | Where |
+|----------|-------|
+| `VITE_CONVEX_URL` | Client |
+| `CONVEX_DEPLOYMENT` | Server |
+| `JWKS` | Convex backend |
+| `JWT_PRIVATE_KEY` | Convex backend |
+| `SITE_URL` | Convex backend |
+
+**Do not modify** `src/convex/auth.config.ts`, `src/convex/auth.ts`, or `src/convex/auth/emailOtp.ts`.
+
+---
+
+## License
+
+No License!
