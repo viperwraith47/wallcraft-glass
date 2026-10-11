@@ -242,6 +242,4 @@ The auth scaffolding uses Convex with email OTP and anonymous users. Environment
 
 ---
 
-## License
 
-No License!
